@@ -11,7 +11,7 @@ classDiagram
         +email: str
         +mot_de_passe_hache: str
         +date_creation: datetime
-        +est_actif: bool
+        +date_derniere_connexion: datetime
         +creer_utilisateur()
         +authentifier()
         +obtenir_utilisateur_par_email()
