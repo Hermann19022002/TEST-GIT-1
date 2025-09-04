@@ -4,132 +4,132 @@
 
 ```mermaid
 ---
-title: QR CODE TRACKING API
+title: API DE SUIVI QR CODE
 ---
 classDiagram
-    namespace Core {
-        class User {
+    namespace Noyau {
+        class Utilisateur {
             +id: int
-            +username: str
+            +nom_utilisateur: str
             +email: str
-            +hashed_password: str
-            +created_at: datetime
-            +is_active: bool
-            +create_user()
-            +authenticate()
-            +get_user_by_email()
+            +mot_de_passe_hache: str
+            +date_creation: datetime
+            +est_actif: bool
+            +creer_utilisateur()
+            +authentifier()
+            +obtenir_utilisateur_par_email()
         }
 
-        class QRCode {
+        class CodeQR {
             +id: int
-            +qr_id: str
-            +content: str
-            +qr_type: str
-            +user_id: int
-            +original_url: str
-            +redirect_url: str
-            +created_at: datetime
-            +is_active: bool
-            +image_path: str
-            +generate_simple_qr()
-            +generate_tracked_qr()
-            +get_qr_by_id()
+            +id_qr: str
+            +contenu: str
+            +type_qr: str
+            +id_utilisateur: int
+            +url_originale: str
+            +url_redirection: str
+            +date_creation: datetime
+            +est_actif: bool
+            +chemin_image: str
+            +generer_qr_simple()
+            +generer_qr_suivi()
+            +obtenir_qr_par_id()
         }
 
-        class TrackingEvent {
+        class EvenementSuivi {
             +id: int
-            +qr_code_id: int
-            +accessed_at: datetime
-            +ip_address: str
-            +user_agent: str
-            +referer: str
-            +country: str
-            +city: str
-            +record_access()
-            +get_stats_by_qr()
+            +id_code_qr: int
+            +date_acces: datetime
+            +adresse_ip: str
+            +agent_utilisateur: str
+            +referent: str
+            +pays: str
+            +ville: str
+            +enregistrer_acces()
+            +obtenir_stats_par_qr()
         }
     }
 
     namespace Services {
-        class QRCodeGenerator {
-            <<utility>>
-            +generate_qr_image(content: str): bytes
-            +customize_qr_code(content: str, options: dict): bytes
-            +save_qr_image(qr_data: bytes, filename: str): str
-            +add_logo_to_qr(qr_image: bytes, logo: bytes): bytes
+        class GenerateurQR {
+            <<utilitaire>>
+            +generer_image_qr(contenu: str): bytes
+            +personnaliser_code_qr(contenu: str, options: dict): bytes
+            +sauvegarder_image_qr(donnees_qr: bytes, nom_fichier: str): str
+            +ajouter_logo_au_qr(image_qr: bytes, logo: bytes): bytes
         }
 
-        class AuthManager {
-            <<utility>>
-            +create_access_token(user_data: dict): str
-            +verify_token(token: str): dict
-            +hash_password(password: str): str
-            +verify_password(password: str, hash: str): bool
-            +get_current_user(token: str): User
+        class GestionnaireAuth {
+            <<utilitaire>>
+            +creer_jeton_acces(donnees_utilisateur: dict): str
+            +verifier_jeton(jeton: str): dict
+            +hacher_mot_de_passe(mot_de_passe: str): str
+            +verifier_mot_de_passe(mot_de_passe: str, hache: str): bool
+            +obtenir_utilisateur_actuel(jeton: str): Utilisateur
         }
 
-        class TrackingService {
+        class ServiceSuivi {
             <<service>>
-            +record_qr_access(qr_id: str, request_data: dict): TrackingEvent
-            +get_usage_statistics(qr_id: str, user_id: int): dict
-            +generate_analytics_report(qr_id: str): dict
-            +get_geographic_stats(qr_id: str): list
-            +get_time_based_stats(qr_id: str): dict
+            +enregistrer_acces_qr(id_qr: str, donnees_requete: dict): EvenementSuivi
+            +obtenir_statistiques_usage(id_qr: str, id_utilisateur: int): dict
+            +generer_rapport_analytique(id_qr: str): dict
+            +obtenir_stats_geographiques(id_qr: str): list
+            +obtenir_stats_temporelles(id_qr: str): dict
         }
 
-        class RedirectService {
+        class ServiceRedirection {
             <<service>>
-            +process_qr_redirect(qr_id: str, request: dict): str
-            +validate_qr_code(qr_id: str): QRCode
-            +log_redirect_attempt(qr_id: str, success: bool): void
+            +traiter_redirection_qr(id_qr: str, requete: dict): str
+            +valider_code_qr(id_qr: str): CodeQR
+            +journaliser_tentative_redirection(id_qr: str, succes: bool): void
         }
     }
 
     namespace API {
-        class QRCodeRouter {
-            <<controller>>
-            +create_simple_qr(content: str): dict
-            +create_tracked_qr(url: str, user: User): dict
-            +get_user_qr_codes(user: User): list
-            +delete_qr_code(qr_id: str, user: User): dict
+        class RouteurQR {
+            <<controleur>>
+            +creer_qr_simple(contenu: str): dict
+            +creer_qr_suivi(url: str, utilisateur: Utilisateur): dict
+            +obtenir_qr_utilisateur(utilisateur: Utilisateur): list
+            +supprimer_code_qr(id_qr: str, utilisateur: Utilisateur): dict
         }
 
-        class UserRouter {
-            <<controller>>
-            +register_user(user_data: dict): dict
-            +login_user(credentials: dict): dict
-            +get_current_user_info(user: User): dict
-            +update_user_profile(user: User, data: dict): dict
+        class RouteurUtilisateur {
+            <<controleur>>
+            +inscrire_utilisateur(donnees_utilisateur: dict): dict
+            +connecter_utilisateur(identifiants: dict): dict
+            +obtenir_info_utilisateur_actuel(utilisateur: Utilisateur): dict
+            +mettre_a_jour_profil(utilisateur: Utilisateur, donnees: dict): dict
         }
 
-        class TrackingRouter {
-            <<controller>>
-            +redirect_qr_code(qr_id: str, request: dict): redirect
-            +get_qr_statistics(qr_id: str, user: User): dict
-            +export_statistics(qr_id: str, user: User): file
+        class RouteurSuivi {
+            <<controleur>>
+            +rediriger_code_qr(id_qr: str, requete: dict): redirect
+            +obtenir_statistiques_qr(id_qr: str, utilisateur: Utilisateur): dict
+            +exporter_statistiques(id_qr: str, utilisateur: Utilisateur): file
         }
     }
 
     %% Relations principales
-    User "1" --> "*" QRCode : owns
-    QRCode "1" --> "*" TrackingEvent : generates
+    Utilisateur "1" --> "*" CodeQR : possède
+    CodeQR "1" --> "*" EvenementSuivi : génère
     
     %% Relations de service
-    QRCodeGenerator ..> QRCode : creates
-    AuthManager ..> User : authenticates
-    TrackingService ..> TrackingEvent : processes
-    TrackingService ..> QRCode : analyzes
-    RedirectService ..> QRCode : redirects
-    RedirectService ..> TrackingEvent : logs
+    GenerateurQR ..> CodeQR : crée
+    GestionnaireAuth ..> Utilisateur : authentifie
+    ServiceSuivi ..> EvenementSuivi : traite
+    ServiceSuivi ..> CodeQR : analyse
+    ServiceRedirection ..> CodeQR : redirige
+    ServiceRedirection ..> EvenementSuivi : journalise
     
     %% Relations avec les contrôleurs
-    QRCodeRouter ..> QRCodeGenerator : uses
-    QRCodeRouter ..> User : requires
-    UserRouter ..> AuthManager : uses
-    TrackingRouter ..> TrackingService : uses
-    TrackingRouter ..> RedirectService : uses
+    RouteurQR ..> GenerateurQR : utilise
+    RouteurQR ..> Utilisateur : requiert
+    RouteurUtilisateur ..> GestionnaireAuth : utilise
+    RouteurSuivi ..> ServiceSuivi : utilise
+    RouteurSuivi ..> ServiceRedirection : utilise
     
     %% Notes
-    note for QRCode "qr_type peut être:\n'simple' ou 'tracked'\n\nContent contient:\n- Texte brut (simple QR)\n- URL de redirection (tracked QR)"
-    note for TrackingEvent "Enregistre chaque scan\nd'un QR code suivi\n\nInformations collectées:\n- Timestamp\n- Géolocalisation\n- Navigateur"
+    note for CodeQR "type_qr peut être:\n'simple' ou 'suivi'\n\nContenu contient:\n- Texte brut (QR simple)\n- URL de redirection (QR suivi)"
+    note for EvenementSuivi "Enregistre chaque scan\nd'un QR code suivi\n\nInformations collectées:\n- Horodatage\n- Géolocalisation\n- Navigateur"
 ```
