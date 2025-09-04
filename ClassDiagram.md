@@ -24,7 +24,6 @@ classDiagram
         +id: int
         +contenu: str
         +date_creation: datetime
-        +est_actif: bool
         +chemin_image: str
         +titre: str
         +description: str
@@ -40,8 +39,6 @@ classDiagram
         +format_contenu: str
         +generer_image()
         +valider_contenu()
-        +obtenir_type_qr()
-        +est_url()
         +est_telephone()
         +est_email()
         +formater_contenu()
@@ -56,12 +53,10 @@ classDiagram
         +derniere_utilisation: datetime
         +generer_image()
         +valider_contenu()
-        +obtenir_type_qr()
         +generer_id_unique()
         +construire_url_redirection()
         +modifier_destination()
         +obtenir_statistiques_rapides()
-        +est_expire()
     }
 
     class EvenementSuivi {
@@ -91,10 +86,4 @@ classDiagram
     Utilisateur "1" --> "*" CodeQRSuivi : possède
     CodeQRSuivi "1" --> "*" EvenementSuivi : génère lors des scans
 
-    %% Notes explicatives
-    note for CodeQR "Classe abstraite\nContient les attributs\net méthodes communes\nà tous les QR codes"
-    
-    note for CodeQRSimple "QR codes simples:\n• Contenu direct (texte, URL, etc.)\n• Pas de suivi\n• Pas d'authentification requise\n• Génération libre"
-    
-    note for CodeQRSuivi "QR codes avec suivi:\n• Redirection via l'API\n• Collecte de données\n• Authentification requise\n• Appartient à un utilisateur"
 ```
